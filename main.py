@@ -41,4 +41,4 @@ def on_shutdown():
 
 if __name__ == '__main__':
     app = get_application()
-    uvicorn.run(app, host="localhost", port=3000)
+    uvicorn.run(app, host="api", port=3000)

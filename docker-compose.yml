@@ -1,0 +1,13 @@
+version: '3.0'
+
+services:
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # command: "python3 main.py"
+    ports:
+      - 3000:3000
+    restart: on-failure
+    
