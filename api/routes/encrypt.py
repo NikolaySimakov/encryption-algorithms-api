@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.post('/rsa')
-async def rsa_encrypt(data: encrypt.EncryptRequest):
+async def rsa_encrypt(data: encrypt.EncryptRequest) -> encrypt.RSAEncryptResponse:
     
     try:
         private_key, encrypted_data = encryptors.rsa_encryptor(data.body)
@@ -30,12 +30,13 @@ async def rsa_encrypt(data: encrypt.EncryptRequest):
 
 
 @router.post('/aes')
-async def aes_encrypt(data: encrypt.EncryptRequest):
+async def aes_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResponse:
     
     try:
         encrypted_data = encryptors.aes_encryptor(data.key, data.body)
+        
         return encrypt.EncryptResponse(
-            body=encrypted_data,
+            body=str(encrypted_data)
         )
     except:
         # TODO: return error
@@ -48,14 +49,11 @@ async def aes_encrypt(data: encrypt.EncryptRequest):
 
 
 @router.post('/kuznechik')
-async def kuznechik_encrypt(data: encrypt.EncryptRequest):
-    # -> encrypt.EncryptResponse
-    print(data)
+async def kuznechik_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResponse:
     try:
         encrypted_data = encryptors.kuznechik_encryptor(data.key, data.body)
-        print(encrypted_data)
         return encrypt.EncryptResponse(
-            body=encrypted_data,
+            body=str(encrypted_data),
         )
     except:
         # TODO: return error
@@ -68,11 +66,11 @@ async def kuznechik_encrypt(data: encrypt.EncryptRequest):
 
 
 @router.post('/magma')
-async def magma_encrypt(data: encrypt.EncryptRequest):
+async def magma_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResponse:
     try:
         encrypted_data = encryptors.magma_encryptor(data.key, data.body)
         return encrypt.EncryptResponse(
-            body=encrypted_data,
+            body=str(encrypted_data),
         )
     except:
         # TODO: return error
