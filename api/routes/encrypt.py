@@ -1,17 +1,81 @@
+from enum import Enum
+from typing import Any
 from http import HTTPStatus
+
 from fastapi import APIRouter, status, HTTPException
-from ...models import request, response
-from ...services.ciphers import sipher_determiner
+from models import encrypt
+
+from services.ciphers import encryptors
+
 router = APIRouter()
 
 
-@router.post('/json/string')
-def process_encrypt_data(data : request) -> response:
+@router.post('/rsa')
+async def rsa_encrypt(data: encrypt.EncryptRequest):
+    
     try:
-        sd = sipher_determiner(data.key)
-        res = sd(data.text)['algorithm']
-        return {"info": res}
+        private_key, encrypted_data = encryptors.rsa_encryptor(data.body)
+        return encrypt.EncryptResponse(
+            key=private_key,
+            body=encrypted_data,
+        )
     except:
+        # TODO: return error
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail={
+                "error": "Invalid request",
+            },
+        )
+
+
+@router.post('/aes')
+async def aes_encrypt(data: encrypt.EncryptRequest):
+    
+    try:
+        encrypted_data = encryptors.aes_encryptor(data.key, data.body)
+        return encrypt.EncryptResponse(
+            body=bytes(encrypted_data),
+        )
+    except:
+        # TODO: return error
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail={
+                "error": "Invalid request",
+            },
+        )
+
+
+@router.post('/kuznechik')
+async def kuznechik_encrypt(data: encrypt.EncryptRequest):
+    # -> encrypt.EncryptResponse
+    print(data)
+    try:
+        encrypted_data = encryptors.kuznechik_encryptor(data.key, data.body)
+        print(encrypted_data)
+        return encrypt.EncryptResponse(
+            body=encrypted_data,
+        )
+    except:
+        # TODO: return error
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail={
+                "error": "Invalid request",
+            },
+        )
+
+
+@router.post('/magma')
+async def magma_encrypt(data: encrypt.EncryptRequest):
+    try:
+        encrypted_data = encryptors.magma_encryptor(data.key, data.body)
+        return encrypt.EncryptResponse(
+            body=encrypted_data,
+        )
+    except:
+        # TODO: return error
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail={
