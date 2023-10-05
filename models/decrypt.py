@@ -7,5 +7,5 @@ class DecryptRequest(BaseModel):
     code: str
 
 class DecryptResponse(BaseModel):
-    key: Any = None
-    body: str | bytes
+    info: str
+    encrypted_info: str

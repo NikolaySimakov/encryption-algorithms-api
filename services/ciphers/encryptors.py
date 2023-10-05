@@ -60,7 +60,7 @@ def kuznechik_encryptor(
                                         mode,
                                         pad_mode=pad_mode)
     
-    return bytes(cipher_obj.encrypt(to_bytes(input_array)))
+    return cipher_obj.encrypt(to_bytes(input_array))
 
 
 def magma_encryptor(
