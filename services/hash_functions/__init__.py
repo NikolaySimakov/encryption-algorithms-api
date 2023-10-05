@@ -1,1 +1,1 @@
-from .streebog import 
+from . import streebog
