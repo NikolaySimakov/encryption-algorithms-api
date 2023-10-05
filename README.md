@@ -51,3 +51,8 @@ Returns:
 {
     "info": "some info"
 }
+
+### run project
+```
+docker compose -f docker-compose.yml up
+```
