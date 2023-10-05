@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-
 from .routes import encrypt_router, decrypt_router
 
 router = APIRouter()
