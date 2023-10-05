@@ -1,1 +1,1 @@
-from .stribog import stribog
+from .streebog import 
