@@ -6,8 +6,7 @@ class EncryptRequest(BaseModel):
     body: str
 
 class EncryptResponse(BaseModel):
+    key: str
     body: str
+    sign: str
     
-class RSAEncryptResponse(BaseModel):
-    key: Any
-    body: Any
