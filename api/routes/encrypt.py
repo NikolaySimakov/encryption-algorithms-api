@@ -10,7 +10,7 @@ from models import encrypt
 from services.ciphers import encryptors
 
 router = APIRouter()
-key = b'12345678901234567890123456789012' 
+# key = b'12345678901234567890123456789012' 
 
 @router.post('/rsa')
 async def rsa_encrypt(data: encrypt.EncryptRequest) -> encrypt.RSAEncryptResponse:
@@ -50,7 +50,7 @@ async def aes_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResponse:
         )
 
 @router.post('/aes/file')
-async def kuzneckik_file_encrypt(file: UploadFile = File(...)):
+async def kuzneckik_file_encrypt(key: str, file: UploadFile = File(...)):
     file_bytes = await file.read()
     encrypted_data = encryptors.aes_encryptor(key, file_bytes)
     return StreamingResponse(io.BytesIO(encrypted_data), media_type='application/octet-stream')
@@ -75,11 +75,20 @@ async def kuznechik_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResp
         )
 
 @router.post('/kuznechik/file')
-async def kuzneckik_file_encrypt(file: UploadFile = File(...)):
+async def kuzneckik_file_encrypt(key: str, file: UploadFile = File(...)):
     
-    file_bytes = await file.read()
-    encrypted_data = encryptors.kuznechik_encryptor(key, file_bytes)
-    return StreamingResponse(io.BytesIO(encrypted_data), media_type='application/octet-stream')
+    try:
+        file_bytes = await file.read()
+        encrypted_data = encryptors.kuznechik_encryptor(key, file_bytes)
+        return StreamingResponse(io.BytesIO(encrypted_data), media_type='application/octet-stream')
+    except:
+        # TODO: return error
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail={
+                "error": "Invalid request",
+            },
+        )
 
 
 
@@ -100,7 +109,18 @@ async def magma_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResponse
         )
     
 @router.post('/magma/file')
-async def kuzneckik_file_encrypt(file: UploadFile = File(...)):
-    file_bytes = await file.read()
-    encrypted_data = encryptors.magma_encryptor(key, file_bytes)
-    return StreamingResponse(io.BytesIO(encrypted_data), media_type='application/octet-stream')
+async def kuzneckik_file_encrypt(key: str, file: UploadFile = File(...)):
+    try:
+        
+        file_bytes = await file.read()
+        encrypted_data = encryptors.magma_encryptor(key, file_bytes, )
+        return StreamingResponse(io.BytesIO(encrypted_data), media_type='application/octet-stream')
+
+    except:
+        # TODO: return error
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail={
+                "error": "Invalid request",
+            },
+        )
