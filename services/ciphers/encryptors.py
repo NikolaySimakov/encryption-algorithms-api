@@ -9,7 +9,7 @@ from typing import Tuple
 
 def to_bytes(key: str | bytes, code="utf-8") -> bytes:
     if type(key) == str:
-        return key.encode()
+        return key.encode(code)
     return key
 
 
@@ -28,7 +28,7 @@ def rsa_encryptor(body: str | bytes) -> Tuple[rsa.key.PrivateKey, str]:
 def aes_encryptor(
     key: str | bytes,
     raw: str,
-) -> bytearray:
+) -> bytes:
     
     '''
     TODO: потом доделаю все остальное
@@ -42,7 +42,7 @@ def aes_encryptor(
     raw = _pad(raw)
     iv = Random.new().read(AES.block_size)
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    return bytearray(bytes(iv + cipher.encrypt(to_bytes(raw))))
+    return bytes(iv + cipher.encrypt(to_bytes(raw)))
 
 
 def kuznechik_encryptor(
@@ -52,7 +52,7 @@ def kuznechik_encryptor(
     mode : int = gostcrypto.gostcipher.MODE_ECB,
     pad_mode_arg: int = 1,
     code="utf-8",
-) -> bytearray:
+) -> bytes:
     key = to_bytes(key, code)
     pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if pad_mode_arg == 1 else gostcrypto.gostcipher.PAD_MODE_2
     cipher_obj = gostcrypto.gostcipher.new('kuznechik',
@@ -60,7 +60,7 @@ def kuznechik_encryptor(
                                         mode,
                                         pad_mode=pad_mode)
     
-    return cipher_obj.encrypt(to_bytes(input_array))
+    return bytes(cipher_obj.encrypt(to_bytes(input_array)))
 
 
 def magma_encryptor(
@@ -70,7 +70,7 @@ def magma_encryptor(
     mode: int = gostcrypto.gostcipher.MODE_ECB,
     pad_mode_arg: int = 1,
     code="utf-8",
-) -> bytearray:
+) -> bytes:
     
     key = to_bytes(key, code)
     pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if pad_mode_arg == 1 else gostcrypto.gostcipher.PAD_MODE_2
@@ -79,4 +79,4 @@ def magma_encryptor(
                                         mode,
                                         pad_mode=pad_mode)
     
-    return cipher_obj.encrypt(to_bytes(input_array))
+    return bytes(cipher_obj.encrypt(to_bytes(input_array)))
