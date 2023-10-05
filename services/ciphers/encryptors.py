@@ -53,30 +53,33 @@ def kuznechik_encryptor(
     pad_mode_arg: int = 1,
     code="utf-8",
 ) -> bytes:
-    key = to_bytes(key, code)
+    key = bytearray(to_bytes(key, 'utf-16'))
+    input_arr = bytearray(to_bytes(input_array, 'utf-16'))
+    print(key, input_arr)
     pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if pad_mode_arg == 1 else gostcrypto.gostcipher.PAD_MODE_2
     cipher_obj = gostcrypto.gostcipher.new('kuznechik',
                                         key,
                                         mode,
                                         pad_mode=pad_mode)
     
-    return cipher_obj.encrypt(to_bytes(input_array))
+    return bytes(cipher_obj.encrypt(input_arr))
 
 
 def magma_encryptor(
     key: str | bytes,
     input_array : str | bytes,
-    block_size : int, 
+    block_size : int = 8, 
     mode: int = gostcrypto.gostcipher.MODE_ECB,
     pad_mode_arg: int = 1,
     code="utf-8",
 ) -> bytes:
     
-    key = to_bytes(key, code)
+    key = to_bytes(key, 'utf-16')
+    
     pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if pad_mode_arg == 1 else gostcrypto.gostcipher.PAD_MODE_2
     cipher_obj = gostcrypto.gostcipher.new('magma',
                                         key,
                                         mode,
                                         pad_mode=pad_mode)
     
-    return bytes(cipher_obj.encrypt(to_bytes(input_array)))
+    return bytes(cipher_obj.encrypt(to_bytes(input_array, 'utf-16')))
