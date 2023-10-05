@@ -17,8 +17,8 @@ Accepts json in format:
 
 ```json
 {
-    key: "some key",
-    body: "some body"
+    "key": "some key",
+    "body": "some body"
 }
 ```
 
@@ -26,7 +26,7 @@ Returns JSON as response (example for aes algorithm):
 
 ```json
 {
-    body: "\\x98\\xd1(\\xdb\\x02\\x16\\x0f\\x05\\x11\\x1af\\xf5\\xe1\\xeb\\x8f6\\x8b/\\x08>l\\xbe;\"m[\\xf3v\\x1a\\xc1\\xe2\\xc6"
+    "body": "\\x98\\xd1(\\xdb\\x02\\x16\\x0f\\x05\\x11\\x1af\\xf5\\xe1\\xeb\\x8f6\\x8b/\\x08>l\\xbe;\"m[\\xf3v\\x1a\\xc1\\xe2\\xc6"
 }
 ```
 
@@ -40,8 +40,8 @@ Accepts json in format:
 
 ```json
 {
-    key: "some key",
-    body: "some body"
+    "key": "some key",
+    "body": "some body"
 }
 ```
 
@@ -49,5 +49,5 @@ Returns:
 
 ```json
 {
-    info: "some info"
+    "info": "some info"
 }
