@@ -51,6 +51,7 @@ Returns:
 {
     "info": "some info"
 }
+```
 
 ### run project
 ```
