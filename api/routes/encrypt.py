@@ -15,7 +15,7 @@ async def rsa_encrypt(data: encrypt.EncryptRequest):
     
     try:
         private_key, encrypted_data = encryptors.rsa_encryptor(data.body)
-        return encrypt.EncryptResponse(
+        return encrypt.RSAEncryptResponse(
             key=private_key,
             body=encrypted_data,
         )
@@ -35,7 +35,7 @@ async def aes_encrypt(data: encrypt.EncryptRequest):
     try:
         encrypted_data = encryptors.aes_encryptor(data.key, data.body)
         return encrypt.EncryptResponse(
-            body=bytes(encrypted_data),
+            body=encrypted_data,
         )
     except:
         # TODO: return error
