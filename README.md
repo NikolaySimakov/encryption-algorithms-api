@@ -1,5 +1,17 @@
 # Encryption algorithms API
 
+### Run project
+
+```
+python app.py
+```
+
+or using Docker:
+
+```
+docker compose -f docker-compose.yml up
+```
+
 # Router
 
 Description of router methods:
@@ -51,9 +63,4 @@ Returns:
 {
     "info": "some info"
 }
-```
-
-### run project
-```
-docker compose -f docker-compose.yml up
 ```
