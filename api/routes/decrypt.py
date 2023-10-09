@@ -1,7 +1,11 @@
 from http import HTTPStatus
 from fastapi import APIRouter, status, HTTPException
+
 from models.decrypt import DecryptRequest, DecryptResponse
 from services.ciphers import sipher_determiner
+
+from api.exceptions import bad_decrypt_request, undetectable_cipher
+
 from fastapi import APIRouter, status, HTTPException, File, UploadFile
 from fastapi.responses import StreamingResponse, FileResponse
 import gostcrypto
@@ -23,10 +27,12 @@ async def process_decrypt_data(file: UploadFile = File(...)):
         sd = sipher_determiner(private_key)
         algorithm = sd(encrypted_data)
         if (algorithm == None or algorithm['algorithm'] == 'none'): 
-            return DecryptResponse(
-                info="can't determine algorithm",
-                encrypted_info=""
-            )
+            # FIX: добавлен класс ошибки
+            raise undetectable_cipher()
+            # return DecryptResponse(
+            #     info="can't determine algorithm",
+            #     encrypted_info=""
+            # )
         
         if algorithm['algorithm'] == 'kuznechik':
             cipher_obj = gostcrypto.gostcipher.new('kuznechik',
@@ -58,12 +64,8 @@ async def process_decrypt_data(file: UploadFile = File(...)):
 
         
     except:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={
-                "error": "Invalid request",
-            },
-        )
+        # FIX: добавлен класс ошибки
+        raise bad_decrypt_request()
 
 
 
@@ -76,10 +78,12 @@ async def process_decrypt_data(data: DecryptRequest):
         sd = sipher_determiner(private_key)
         algorithm = sd(encrypted_data)
         if (algorithm == None or algorithm['algorithm'] == 'none'): 
-            return DecryptResponse(
-                info="can't determine algorithm",
-                encrypted_info=""
-            )
+            # FIX: добавлен класс ошибки
+            raise undetectable_cipher()
+            # return DecryptResponse(
+            #     info="can't determine algorithm",
+            #     encrypted_info=""
+            # )
         
         if algorithm['algorithm'] == 'kuznechik':
             cipher_obj = gostcrypto.gostcipher.new('kuznechik',
@@ -111,9 +115,5 @@ async def process_decrypt_data(data: DecryptRequest):
 
         
     except:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={
-                "error": "Invalid request",
-            },
-        )
+        # FIX: добавлен класс ошибки
+        raise bad_decrypt_request()

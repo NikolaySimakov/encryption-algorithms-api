@@ -10,6 +10,8 @@ from models import encrypt
 from services.ciphers import encryptors
 from services.hash_functions import streebog
 
+from api.exceptions import bad_data_for_encrypt
+
 router = APIRouter()
 
 @router.post('/rsa')
@@ -24,13 +26,8 @@ async def rsa_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResponse:
             sign=str(_hash),
         )
     except:
-        # TODO: return error
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={
-                "error": "Invalid request",
-            },
-        )
+        # FIX: добавлен класс ошибки
+        raise bad_data_for_encrypt()
 
 
 @router.post('/aes')
@@ -46,13 +43,8 @@ async def aes_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResponse:
             sign=str(_hash),
         )
     except:
-        # TODO: return error
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={
-                "error": "Invalid request",
-            },
-        )
+        # FIX: добавлен класс ошибки
+        raise bad_data_for_encrypt()
 
 
 @router.post('/aes/file')
@@ -65,13 +57,8 @@ async def kuzneckik_file_encrypt(key: str, file: UploadFile = File(...)):
         return StreamingResponse(io.BytesIO(encrypted_data), media_type='application/octet-stream')
     
     except:
-        # TODO: return error
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={
-                "error": "Invalid request",
-            },
-        )
+        # FIX: добавлен класс ошибки
+        raise bad_data_for_encrypt()
 
 
 @router.post('/kuznechik')
@@ -85,13 +72,8 @@ async def kuznechik_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResp
             sign=_hash,
         )
     except Exception as e:
-        # TODO: return error
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={
-                "error": e,
-            },
-        )
+        # FIX: добавлен класс ошибки
+        raise bad_data_for_encrypt()
 
 
 @router.post('/kuznechik/file')
@@ -102,13 +84,8 @@ async def kuzneckik_file_encrypt(key: str, file: UploadFile = File(...)):
         encrypted_data = encryptors.kuznechik_encryptor(key, file_bytes)
         return StreamingResponse(io.BytesIO(encrypted_data), media_type='application/octet-stream')
     except:
-        # TODO: return error
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={
-                "error": "Invalid request",
-            },
-        )
+        # FIX: добавлен класс ошибки
+        raise bad_data_for_encrypt()
 
 
 
@@ -123,13 +100,8 @@ async def magma_encrypt(data: encrypt.EncryptRequest) -> encrypt.EncryptResponse
             sign=_hash,
         )
     except:
-        # TODO: return error
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={
-                "error": "Invalid request",
-            },
-        )
+        # FIX: добавлен класс ошибки
+        raise bad_data_for_encrypt()
     
     
 @router.post('/magma/file')
@@ -141,10 +113,5 @@ async def kuzneckik_file_encrypt(key: str, file: UploadFile = File(...)):
         return StreamingResponse(io.BytesIO(encrypted_data), media_type='application/octet-stream')
 
     except:
-        # TODO: return error
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={
-                "error": "Invalid request",
-            },
-        )
+        # FIX: добавлен класс ошибки
+        raise bad_data_for_encrypt()
