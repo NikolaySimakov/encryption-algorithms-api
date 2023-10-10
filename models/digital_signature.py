@@ -16,3 +16,6 @@ class DigitalSignatureVerifyRequest(BaseModel):
 
 class DigitalSignatureVerifyResponse(BaseModel):
     res: bool
+
+class GeneratePublicKeyRequest(BaseModel):
+    private_key: str
