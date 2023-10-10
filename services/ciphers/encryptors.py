@@ -47,12 +47,12 @@ def aes_encryptor(
 
 def kuznechik_encryptor(
     key: str | bytes,
-    input_array : str | bytes,
+    input_array : str | bytes | bytearray,
     block_size : int = 16,
     mode : int = gostcrypto.gostcipher.MODE_ECB,
     pad_mode_arg: int = 1,
     code="utf-8",
-) -> bytes:
+):
     key = to_bytes(key, code)
     input_arr = to_bytes(input_array, code)
     
@@ -62,7 +62,7 @@ def kuznechik_encryptor(
                                         mode,
                                         pad_mode=pad_mode)
     
-    return bytes(cipher_obj.encrypt(input_arr))
+    return cipher_obj.encrypt(input_arr)
 
 
 def magma_encryptor(

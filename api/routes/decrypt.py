@@ -2,7 +2,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, status, HTTPException
 
 from models.decrypt import DecryptRequest, DecryptResponse
-from services.ciphers import sipher_determiner
+from services.ciphers import sipher_determiner, encryptors
 
 from api.exceptions import bad_decrypt_request, undetectable_cipher
 
@@ -19,13 +19,15 @@ router = APIRouter()
         
 
 @router.post('/json/file')
-async def process_decrypt_data(file: UploadFile = File(...)):
-    private_key = b'12345678901234567890123456789012' # for testing
-    try:
-        encrypted_data = await file.read()
+async def process_decrypt_data(key: str, file: UploadFile = File(...)):
+
+    # try:
+        encrypted_data_bytes = await file.read()
+        encrypted_data = bytearray(encrypted_data_bytes)
         print(encrypted_data)
-        sd = sipher_determiner(private_key)
+        sd = sipher_determiner.syphers_determiner(key)
         algorithm = sd(encrypted_data)
+        print(algorithm)
         if (algorithm == None or algorithm['algorithm'] == 'none'): 
             # FIX: добавлен класс ошибки
             raise undetectable_cipher()
@@ -33,12 +35,14 @@ async def process_decrypt_data(file: UploadFile = File(...)):
             #     info="can't determine algorithm",
             #     encrypted_info=""
             # )
-        
+
+        key_bytes = encryptors.to_bytes(key)
+        pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if algorithm['pad_mode'] == 1 or algorithm['pad_mode'] == None else gostcrypto.gostcipher.PAD_MODE_2
         if algorithm['algorithm'] == 'kuznechik':
             cipher_obj = gostcrypto.gostcipher.new('kuznechik',
-                                        private_key,
+                                        key_bytes,
                                         algorithm['mode'],
-                                        pad_mode=algorithm['pad_mode'])
+                                        pad_mode=pad_mode)
             return DecryptResponse(
                 info='kuznechik algorithm',
                 encrypted_info=str(cipher_obj.encrypt(b'kuznechik algorithm'))
@@ -46,16 +50,16 @@ async def process_decrypt_data(file: UploadFile = File(...)):
         
         if algorithm['algorithm'] == 'magma':
             cipher_obj = gostcrypto.gostcipher.new('magma',
-                                        private_key,
+                                        key_bytes,
                                         algorithm['mode'],
-                                        pad_mode=algorithm['pad_mode'])
+                                        pad_mode=pad_mode)
             return DecryptResponse(
                 info='magma algorithm',
                 encrypted_info=str(cipher_obj.encrypt(b'magma algorithm'))
             )
         
         if algorithm['algorithm'] == 'aes':
-            cipher = AES.new(private_key, AES.MODE_ECB)
+            cipher = AES.new(key, AES.MODE_ECB)
             ei=cipher.encrypt(pad(b'aes algorithm', 16))
             return DecryptResponse(
                 info='aes algorithm',
@@ -63,9 +67,9 @@ async def process_decrypt_data(file: UploadFile = File(...)):
             )
 
         
-    except:
-        # FIX: добавлен класс ошибки
-        raise bad_decrypt_request()
+    # except:
+    #     # FIX: добавлен класс ошибки
+    #     raise bad_decrypt_request()
 
 
 

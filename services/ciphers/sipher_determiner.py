@@ -15,7 +15,7 @@ class syphers_determiner:
     def try_gost_algorithm(
             self,
             name: str,
-            input_array : bytes, 
+            input_array : bytes | bytearray, 
             block_size : int, 
             mode : int,
             pad_mode_arg=1,
@@ -53,7 +53,7 @@ class syphers_determiner:
                     
         return {'algorithm' : 'none'}
 
-    def kuznechik_check(self, input_array: bytes, code="utf-8"):
+    def kuznechik_check(self, input_array: bytes | bytearray, code="utf-8"):
 
         for mode in range(1, 7):
             if (mode == 4):
@@ -66,7 +66,7 @@ class syphers_determiner:
                 if (res['algorithm'] != 'none'):
                     return {'algorithm' : 'kuznechik', 'mode': mode, 'pad_mode': 2}
 
-    def magma_check(self, input_array: bytes, code="utf-8"):
+    def magma_check(self, input_array: bytes | bytearray, code="utf-8"):
 
         for mode in range(1, 7):
             if (mode == 4):
@@ -79,7 +79,7 @@ class syphers_determiner:
                 if (res['algorithm'] != 'none'):
                     return {'algorithm' : 'magma', 'mode': mode, 'pad_mode': 2}
 
-    def aes_check(self, input_array: bytes, code="utf-8"):
+    def aes_check(self, input_array: bytes | bytearray, code="utf-8"):
 
         block_size=16
         for mode in range(1, 12):
@@ -103,7 +103,7 @@ class syphers_determiner:
                 
 
     def __call__(self, 
-                 input_array: bytes | str,
+                 input_array: bytes | str | bytearray,
                  code="utf-8", 
                  *args: Any, **kwds: Any) -> str:
         
