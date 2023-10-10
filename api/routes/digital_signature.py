@@ -15,12 +15,12 @@ router = APIRouter()
 
 @router.post('/signature_process')
 async def signature_process(data: digital_signature.DigitalSignatureProcessRequest) -> digital_signature.DigitalSignatureProcessResponse:
-    # try:
+    try:
         sign = _signature_process(message=data.message, private_key=bytearray(to_bytes(data.private_key, "cp1251")))
         return StreamingResponse(io.BytesIO(sign), media_type='application/octet-stream')
-    # except:
-    #     # FIX: добавлен класс ошибки
-    #     raise bad_data_for_encrypt()
+    except:
+        # FIX: добавлен класс ошибки
+        raise bad_data_for_encrypt()
 
 @router.post('/generate_public_key')
 async def generate_public_key(data: digital_signature.GeneratePublicKeyRequest):
