@@ -5,25 +5,33 @@ import io
 
 from fastapi import APIRouter, status, HTTPException, File, UploadFile
 from models import digital_signature
-
-from services.ciphers import encryptors
-from services.hash_functions import streebog
+from services.digital_signatures import signature_process as _signature_create, signature_verify as _signature_verify
+from services.ciphers.encryptors import to_bytes
 
 from api.exceptions import bad_data_for_encrypt
 
 router = APIRouter()
 
-@router.post('/')
-async def create_digital_signature(data: digital_signature.DigitalSignatureRequest) -> digital_signature.DigitalSignatureResponse:
-    
+@router.post('/signature_process')
+async def signature_process(data: digital_signature.DigitalSignatureProcessRequest) -> digital_signature.DigitalSignatureProcessResponse:
     try:
-        private_key, encrypted_data = encryptors.rsa_encryptor(data.body)
-        _hash = streebog.get_hash(data.body)
-        return encrypt.EncryptResponse(
-            key=str(private_key),
-            body=str(encrypted_data),
-            sign=str(_hash),
+        sign = _signature_create(data.message, bytearray(to_bytes(data.private_key)))
+        return digital_signature.DigitalSignatureProcessResponse(
+            public_key=sign["public_key"],
+            signed_message=sign["sign"]
         )
     except:
         # FIX: добавлен класс ошибки
         raise bad_data_for_encrypt()
+
+@router.post('/signature_verify')
+async def signature_verify(data: digital_signature.DigitalSignatureVerifyRequest) -> digital_signature.DigitalSignatureVerifyResponse:
+    try:
+        check = _signature_verify(message=data.message, sign=bytearray(to_bytes(data.signed_message)), public_key=bytearray(to_bytes(data.public_key)))
+        return digital_signature.DigitalSignatureVerifyResponse(
+            res=check
+        )
+    except:
+        # FIX: добавлен класс ошибки
+        raise bad_data_for_encrypt()
+
