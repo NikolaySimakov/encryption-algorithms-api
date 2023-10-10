@@ -1,6 +1,7 @@
 import rsa
 import gostcrypto
 from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 from Crypto import Random
 import hashlib
 
@@ -27,23 +28,27 @@ def rsa_encryptor(body: str | bytes) -> Tuple[rsa.key.PrivateKey, str]:
 
 def aes_encryptor(
     key: str | bytes,
-    raw: str,
+    raw: str | bytes,
 ) -> bytes:
     
     '''
     TODO: потом доделаю все остальное
     '''
+    key = to_bytes(key)
+    # key = hashlib.sha256(to_bytes(key)).digest()
     
-    key = hashlib.sha256(to_bytes(key)).digest()
+    # def _pad(s):
+    #     return s + (AES.block_size - len(s) % AES.block_size) * chr(AES.block_size - len(s) % AES.block_size)
     
-    def _pad(s):
-        return s + (AES.block_size - len(s) % AES.block_size) * chr(AES.block_size - len(s) % AES.block_size)
-    
-    raw = _pad(raw)
-    iv = Random.new().read(AES.block_size)
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    return bytes(iv + cipher.encrypt(to_bytes(raw)))
+    # raw = _pad(raw)
+    # iv = Random.new().read(AES.block_size)
+    # cipher = AES.new(key, AES.MODE_CBC, iv)
+    # return bytes(iv + cipher.encrypt(to_bytes(raw)))
 
+    cipher = AES.new(key, AES.MODE_ECB)
+    encrypted_data = cipher.encrypt(pad(raw, 16))
+
+    return encrypted_data
 
 def kuznechik_encryptor(
     key: str | bytes,
@@ -67,12 +72,12 @@ def kuznechik_encryptor(
 
 def magma_encryptor(
     key: str | bytes,
-    input_array : str | bytes,
+    input_array : str | bytes | bytearray,
     block_size : int = 8, 
     mode: int = gostcrypto.gostcipher.MODE_ECB,
     pad_mode_arg: int = 1,
     code="utf-8",
-) -> bytes:
+):
     
     key = to_bytes(key, code)
     input_arr = to_bytes(input_array, code)
@@ -83,4 +88,4 @@ def magma_encryptor(
                                         mode,
                                         pad_mode=pad_mode)
     
-    return bytes(cipher_obj.encrypt(input_arr))
+    return cipher_obj.encrypt(input_arr)
