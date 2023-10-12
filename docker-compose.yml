@@ -1,13 +1,40 @@
 version: '3.0'
 
 services:
+  db:
+    container_name: db
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=keydb
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - api_network
+
   api:
     container_name: api
     build:
       context: .
       dockerfile: Dockerfile
-    # command: "python3 main.py"
+    command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 3000 --reload"
+    environment:
+      - DB_URL=postgresql://postgres:postgres@db:5432/keydb
     ports:
       - 3000:3000
     restart: on-failure
+    depends_on:
+      - db
+    networks:
+      - api_network
     
+volumes:
+  pgdata:
+
+networks:
+  api_network:
+    driver: bridge

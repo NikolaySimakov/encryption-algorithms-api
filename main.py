@@ -1,5 +1,6 @@
 # Detele if Docker 
 import uvicorn
+import os
 
 # Main dependencies
 from fastapi import FastAPI
@@ -8,6 +9,7 @@ import logging
 from api import api_router
 from config import get_app_settings
 
+from fastapi_sqlalchemy import DBSessionMiddleware, db
 
 # Setup application
 def get_application() -> FastAPI:
@@ -27,6 +29,8 @@ def get_application() -> FastAPI:
     
     app.include_router(api_router)
     
+    app.add_middleware(DBSessionMiddleware, db_url=os.environ["DB_URL"])
+
     return app
 
 
@@ -39,6 +43,8 @@ def on_shutdown():
     pass
 
 
-if __name__ == '__main__':
-    app = get_application()
-    uvicorn.run(app, host="api", port=3000)
+app = get_application()
+
+# if __name__ == '__main__':
+#     app = get_application()
+    # uvicorn.run(app, host="api", port=3000)

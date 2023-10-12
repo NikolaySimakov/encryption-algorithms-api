@@ -5,4 +5,5 @@ COPY requirements.txt requirements.txt
 RUN pip3 install -U pip
 RUN pip3 install -U -r requirements.txt
 COPY . /src/
-CMD [ "python3", "main.py" ]  
+# CMD [ "python3", "main.py" ]  
+EXPOSE 3000
