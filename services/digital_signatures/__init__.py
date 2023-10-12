@@ -1,1 +1,1 @@
-from .digital_signature import signature_process, signature_verify
+from .digital_signature import signature_process, signature_verify, generate_key
