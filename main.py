@@ -30,7 +30,7 @@ def get_application() -> FastAPI:
     app.include_router(api_router)
     
     app.add_middleware(DBSessionMiddleware, db_url=os.environ["DB_URL"])
-
+    # app.add_middleware(DBSessionMiddleware, db_url="postgresql://postgres:postgres@localhost:5433/keydb")
     return app
 
 

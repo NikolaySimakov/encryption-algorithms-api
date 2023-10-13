@@ -21,7 +21,7 @@ router = APIRouter()
 @router.post('/json/file')
 async def process_decrypt_data(key: str, file: UploadFile = File(...)):
 
-    # try:
+    try:
         encrypted_data_bytes = await file.read()
         encrypted_data = bytearray(encrypted_data_bytes)
         sd = sipher_determiner.sipher_determiner(key)
@@ -65,6 +65,6 @@ async def process_decrypt_data(key: str, file: UploadFile = File(...)):
             )
 
         
-    # except:
-    #     # FIX: добавлен класс ошибки
-    #     raise bad_decrypt_request()
+    except:
+        # FIX: добавлен класс ошибки
+        raise bad_decrypt_request()

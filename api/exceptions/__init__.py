@@ -1,3 +1,4 @@
 from .bad_decrypt_request import bad_decrypt_request
 from .bad_data_for_encrypt import bad_data_for_encrypt
 from .undetectable_cipher import undetectable_cipher
+from .bad_data import bad_data
