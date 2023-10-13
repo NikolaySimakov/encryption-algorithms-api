@@ -1,8 +1,11 @@
 from http import HTTPStatus
 from fastapi import APIRouter, status, HTTPException
 
+from .auth import get_user_keys
+
 from models.decrypt import DecryptRequest, DecryptResponse
 from services.ciphers import sipher_determiner, encryptors
+from models.auth import LoginRequest
 
 from api.exceptions import bad_decrypt_request, undetectable_cipher
 
@@ -18,7 +21,7 @@ router = APIRouter()
 # но классы расчитаны и на получение всех данных извне (ключа тоже)
         
 
-@router.post('/json/file')
+@router.post('/json/key')
 async def process_decrypt_data(key: str, file: UploadFile = File(...)):
 
     try:
@@ -68,3 +71,18 @@ async def process_decrypt_data(key: str, file: UploadFile = File(...)):
     except:
         # FIX: добавлен класс ошибки
         raise bad_decrypt_request()
+
+
+@router.post('/json/name')
+async def decrypt_by_name(name : str, file : UploadFile = File(...)) -> DecryptResponse:
+    keys = await get_user_keys(LoginRequest(name=name))
+
+    for key in keys:
+        try:
+            algorithm = await process_decrypt_data(key, file)
+            if algorithm is None:
+                continue
+            else:
+                return algorithm
+        except:
+            continue
