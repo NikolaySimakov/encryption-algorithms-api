@@ -1,8 +1,13 @@
 from typing import Any
+
 import gostcrypto
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
+
+from resources import GOSTAlgorithm, PadMode, BlockSize
 from ..tools.validators import remove_fillers, is_decodable, check_empty, check_json_item, is_valid_json
+
+
 
 class sipher_determiner:
 
@@ -21,7 +26,7 @@ class sipher_determiner:
             pad_mode_arg=1,
             code="utf-8"):
         
-        if pad_mode_arg == 2:
+        if pad_mode_arg == PadMode.PAD_MODE_2:
             cipher_obj = gostcrypto.gostcipher.new(
                         name,
                         self.key,
@@ -57,33 +62,33 @@ class sipher_determiner:
             if is_valid_json(decrypted_array):
                 return {'algorithm' : name, 'mode': mode, 'pad_mode': pad_mode_arg}
                     
-        return {'algorithm' : 'none'}
+        return {'algorithm' : GOSTAlgorithm.NONE}
 
     def kuznechik_check(self, input_array: bytes | bytearray, code="utf-8"):
 
         for mode in range(1, 7):
             if (mode == 4):
                 continue
-            res = self.try_gost_algorithm('kuznechik', input_array, 16, mode, 1, code)
-            if (res != None and res['algorithm'] != 'none'):
-                return {'algorithm' : 'kuznechik', 'mode': mode, 'pad_mode': 1}
+            res = self.try_gost_algorithm('kuznechik', input_array, BlockSize.KUZNECHIK, mode, PadMode.PAD_MODE_1, code)
+            if (res != None and res['algorithm'] != GOSTAlgorithm.NONE):
+                return {'algorithm' : GOSTAlgorithm.KUZNECHIK, 'mode': mode, 'pad_mode': PadMode.PAD_MODE_1}
             if mode == 1 or mode == 2:
-                res = self.try_gost_algorithm('kuznechik', input_array, 16, mode, 2, code)
-                if (res['algorithm'] != 'none'):
-                    return {'algorithm' : 'kuznechik', 'mode': mode, 'pad_mode': 2}
+                res = self.try_gost_algorithm('kuznechik', input_array, BlockSize.KUZNECHIK, mode, PadMode.PAD_MODE_2, code)
+                if (res['algorithm'] != GOSTAlgorithm.NONE):
+                    return {'algorithm' : GOSTAlgorithm.KUZNECHIK, 'mode': mode, 'pad_mode': PadMode.PAD_MODE_2}
 
     def magma_check(self, input_array: bytes | bytearray, code="utf-8"):
 
         for mode in range(1, 7):
             if (mode == 4):
                 continue
-            res = self.try_gost_algorithm('magma', input_array, 8, mode, 1, code)
-            if (res != None and res['algorithm'] != 'none'):
-                return {'algorithm' : 'magma', 'mode': mode, 'pad_mode': 1}
+            res = self.try_gost_algorithm('magma', input_array, BlockSize.MAGMA, mode, PadMode.PAD_MODE_1, code)
+            if (res != None and res['algorithm'] != GOSTAlgorithm.NONE):
+                return {'algorithm' : GOSTAlgorithm.MAGMA, 'mode': mode, 'pad_mode': PadMode.PAD_MODE_1}
             if mode == 1 or mode == 2:
-                res = self.try_gost_algorithm('magma', input_array, 8, mode, 2, code)
-                if (res['algorithm'] != 'none'):
-                    return {'algorithm' : 'magma', 'mode': mode, 'pad_mode': 2}
+                res = self.try_gost_algorithm('magma', input_array, BlockSize.MAGMA, mode, PadMode.PAD_MODE_2, code)
+                if (res['algorithm'] != GOSTAlgorithm.NONE):
+                    return {'algorithm' : GOSTAlgorithm.MAGMA, 'mode': mode, 'pad_mode': PadMode.PAD_MODE_2}
 
     def aes_check(self, input_array: bytes, code="utf-8"):
 
@@ -107,13 +112,13 @@ class sipher_determiner:
             #                 return {'algorithm' : 'aes', 'mode': mode}
 
             cipher_obj = AES.new(self.key, mode)
-            decrypted_array = unpad(cipher_obj.decrypt(input_array), 16)
+            decrypted_array = unpad(cipher_obj.decrypt(input_array), BlockSize.AES)
 
             if is_decodable(decrypted_array):
                 if is_valid_json(decrypted_array):
-                    return {'algorithm' : 'aes', 'mode': mode}
+                    return {'algorithm' : GOSTAlgorithm.AES, 'mode': mode}
                     
-        return {'algorithm' : 'none'}
+        return {'algorithm' : GOSTAlgorithm.NONE}
 
     def __call__(self, 
                  input_array: str | bytes | bytearray,
@@ -124,17 +129,17 @@ class sipher_determiner:
             input_array = input_array.encode(code)
         try:
             res = self.kuznechik_check(input_array, code)
-            if (res != None and res['algorithm'] != 'none'):
+            if (res != None and res['algorithm'] != GOSTAlgorithm.NONE):
                 return res
 
             res = self.magma_check(input_array, code)
-            if (res != None and res['algorithm'] != 'none'):
+            if (res != None and res['algorithm'] != GOSTAlgorithm.NONE):
                 return res
             
             res = self.aes_check(input_array, code)
-            if (res != None and res['algorithm'] != 'none'):
+            if (res != None and res['algorithm'] != GOSTAlgorithm.NONE):
                 return res
         except:
-            return {'algorithm' : 'none'}
+            return {'algorithm' : GOSTAlgorithm.NONE}
         
         

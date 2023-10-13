@@ -6,6 +6,7 @@ from Crypto import Random
 import hashlib
 
 from typing import Tuple
+from resources import PadMode, BlockSize
 
 
 def to_bytes(key: str | bytes, code="utf-8") -> bytes:
@@ -46,22 +47,22 @@ def aes_encryptor(
     # return bytes(iv + cipher.encrypt(to_bytes(raw)))
 
     cipher = AES.new(key, AES.MODE_ECB)
-    encrypted_data = cipher.encrypt(pad(raw, 16))
+    encrypted_data = cipher.encrypt(pad(raw, BlockSize.AES))
 
     return encrypted_data
 
 def kuznechik_encryptor(
     key: str | bytes,
     input_array : str | bytes | bytearray,
-    block_size : int = 16,
+    block_size : int = BlockSize.KUZNECHIK,
     mode : int = gostcrypto.gostcipher.MODE_ECB,
-    pad_mode_arg: int = 1,
+    pad_mode_arg: int = PadMode.PAD_MODE_1,
     code="utf-8",
 ):
     key = to_bytes(key, code)
     input_arr = to_bytes(input_array, code)
     
-    pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if pad_mode_arg == 1 else gostcrypto.gostcipher.PAD_MODE_2
+    pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if pad_mode_arg == PadMode.PAD_MODE_1 else gostcrypto.gostcipher.PAD_MODE_2
     cipher_obj = gostcrypto.gostcipher.new('kuznechik',
                                         key,
                                         mode,
@@ -73,16 +74,16 @@ def kuznechik_encryptor(
 def magma_encryptor(
     key: str | bytes,
     input_array : str | bytes | bytearray,
-    block_size : int = 8, 
+    block_size : int = BlockSize.MAGMA, 
     mode: int = gostcrypto.gostcipher.MODE_ECB,
-    pad_mode_arg: int = 1,
+    pad_mode_arg: int = PadMode.PAD_MODE_1,
     code="utf-8",
 ):
     
     key = to_bytes(key, code)
     input_arr = to_bytes(input_array, code)
     
-    pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if pad_mode_arg == 1 else gostcrypto.gostcipher.PAD_MODE_2
+    pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if pad_mode_arg == PadMode.PAD_MODE_1 else gostcrypto.gostcipher.PAD_MODE_2
     cipher_obj = gostcrypto.gostcipher.new('magma',
                                         key,
                                         mode,

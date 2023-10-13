@@ -6,6 +6,7 @@ from .auth import get_user_keys
 from models.decrypt import DecryptRequest, DecryptResponse
 from services.ciphers import sipher_determiner, encryptors
 from models.auth import LoginRequest
+from resources import GOSTAlgorithm, PadMode, BlockSize
 
 from api.exceptions import bad_decrypt_request, undetectable_cipher
 
@@ -38,8 +39,8 @@ async def process_decrypt_data(key: str, file: UploadFile = File(...)):
             # )
 
         key_bytes = encryptors.to_bytes(key)
-        pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if 'pad_mode' not in algorithm or algorithm['pad_mode'] == 1 or algorithm['pad_mode'] == None else gostcrypto.gostcipher.PAD_MODE_2
-        if algorithm['algorithm'] == 'kuznechik':
+        pad_mode = gostcrypto.gostcipher.PAD_MODE_1 if 'pad_mode' not in algorithm or algorithm['pad_mode'] == PadMode.PAD_MODE_1 or algorithm['pad_mode'] == None else gostcrypto.gostcipher.PAD_MODE_2
+        if algorithm['algorithm'] == GOSTAlgorithm.KUZNECHIK:
             cipher_obj = gostcrypto.gostcipher.new('kuznechik',
                                         key_bytes,
                                         algorithm['mode'],
@@ -49,7 +50,7 @@ async def process_decrypt_data(key: str, file: UploadFile = File(...)):
                 encrypted_info=str(cipher_obj.encrypt(b'kuznechik algorithm'))
             )
         
-        if algorithm['algorithm'] == 'magma':
+        if algorithm['algorithm'] == GOSTAlgorithm.MAGMA:
             cipher_obj = gostcrypto.gostcipher.new('magma',
                                         key_bytes,
                                         algorithm['mode'],
@@ -59,9 +60,9 @@ async def process_decrypt_data(key: str, file: UploadFile = File(...)):
                 encrypted_info=str(cipher_obj.encrypt(b'magma algorithm'))
             )
         
-        if algorithm['algorithm'] == 'aes':
+        if algorithm['algorithm'] == GOSTAlgorithm.AES:
             cipher = AES.new(key_bytes, algorithm['mode'])
-            ei=cipher.encrypt(pad(b'aes algorithm', 16))
+            ei=cipher.encrypt(pad(b'aes algorithm', BlockSize.AES))
             return DecryptResponse(
                 info='aes algorithm',
                 encrypted_info=str(ei)
